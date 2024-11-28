@@ -14,6 +14,15 @@ async function bootstrap() {
     .setTitle('Zentro')
     .setDescription('Zentro API | Documentation')
     .setVersion('1.0.0')
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      in: 'header',
+      name: 'Authorization',
+      description: 'Enter your Bearer token',
+    })
+    .addSecurityRequirements('bearer')
     .build()
 
   const document = SwaggerModule.createDocument(app, config)
