@@ -1,5 +1,16 @@
-import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common'
-import { ApiOperation, ApiTags } from '@nestjs/swagger'
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common'
+import {
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger'
 // import { User } from '@prisma/client'
 import { Response } from 'express'
 
@@ -13,7 +24,12 @@ import { LoginUserDto } from '../users/dto/login-user.dto'
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @ApiOperation({ summary: "Logs the user in. Attaches a \"Authentication\" cookie to the response." })
+  @ApiOperation({
+    summary:
+      'Logs the user in, attaches an "Authentication" cookie to the response',
+  })
+  @ApiUnauthorizedResponse({ description: 'Credentials are not valid.' })
+  @HttpCode(200)
   @UseGuards(LocalAuthGuard)
   @Post('login')
   login(
