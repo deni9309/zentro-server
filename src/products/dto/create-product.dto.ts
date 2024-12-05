@@ -1,5 +1,5 @@
 import {
-  IsDecimal,
+  IsNumber,
   IsString,
   MaxLength,
   MinLength,
@@ -16,6 +16,6 @@ export class CreateProductDto {
   @MaxLength(600)
   description: string
 
-  @IsDecimal()
-  price: string
+  @IsNumber({ maxDecimalPlaces: 2 })
+  price: number
 }
