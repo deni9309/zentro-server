@@ -12,4 +12,7 @@ export class ProductDto {
 
   @IsNumber()
   price: number
+
+  @IsString()
+  userId: string
 }
