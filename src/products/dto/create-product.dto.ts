@@ -1,4 +1,9 @@
-import { IsNumber, IsString, MaxLength, MinLength } from 'class-validator'
+import {
+  IsDecimal,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator'
 
 export class CreateProductDto {
   @IsString()
@@ -11,6 +16,6 @@ export class CreateProductDto {
   @MaxLength(600)
   description: string
 
-  @IsNumber()
-  price: number
+  @IsDecimal()
+  price: string
 }

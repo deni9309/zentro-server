@@ -12,6 +12,4 @@ export class ProductDto {
 
   @IsNumber()
   price: number
-
-  
 }

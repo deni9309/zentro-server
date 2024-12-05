@@ -3,13 +3,15 @@ import * as bcrypt from 'bcrypt'
 
 import { PrismaService } from '../prisma/prisma.service'
 import { CreateUserDto } from './dto/create-user.dto'
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client'
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createUser(data: CreateUserDto): Promise<{ id: string; email: string }> {
+  async createUser(
+    data: CreateUserDto,
+  ): Promise<{ id: string; email: string }> {
     try {
       return await this.prismaService.user.create({
         data: {
@@ -29,7 +31,7 @@ export class UsersService {
     }
   }
 
-  async getUser(filter:Prisma.UserWhereUniqueInput) {
+  async getUser(filter: Prisma.UserWhereUniqueInput) {
     return this.prismaService.user.findUniqueOrThrow({ where: filter })
   }
 }

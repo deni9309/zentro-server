@@ -7,10 +7,11 @@ import { CreateProductDto } from './dto/create-product.dto'
 export class ProductsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createProduct(data: CreateProductDto, userId: string) {
+  async createProduct(productData: CreateProductDto, userId: string) {
     return this.prismaService.product.create({
       data: {
-        ...data,
+        ...productData,
+        price: Number(productData.price),
         userId,
       },
     })

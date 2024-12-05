@@ -19,6 +19,7 @@ export class ProductsController {
     @Body() product: CreateProductDto,
     @CurrentUser() user: TokenPayload,
   ) {
+    console.log('product from controller', product)
     return this.productsService.createProduct(product, user.userId)
   }
 }
