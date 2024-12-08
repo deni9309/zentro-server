@@ -17,6 +17,11 @@ export class ProductsService {
     })
   }
 
+  uploadProductImage(productId: string, file: Buffer) {
+    console.log("productId", productId)
+    console.log("file", file)
+  }
+
   async getProducts() {
     return this.prismaService.product.findMany()
   }
