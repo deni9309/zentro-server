@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { LoggerModule } from 'nestjs-pino'
+import { join } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 import { UsersModule } from './users/users.module'
 import { AuthModule } from './auth/auth.module';
@@ -25,6 +27,9 @@ import { ProductsModule } from './products/products.module';
         }
       },
       inject: [ConfigService],
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
     }),
     ConfigModule.forRoot(),
     UsersModule,
