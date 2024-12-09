@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common'
 import {
   ApiCreatedResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
@@ -27,6 +28,7 @@ import { CreateProductDto } from './dto/create-product.dto'
 import { CurrentUser } from '../auth/current-user.decorator'
 import { TokenPayload } from '../auth/token-payload.interface'
 import { ProductDto } from './dto/product.dto'
+import { PRODUCT_IMAGES } from './product-images'
 
 @ApiTags('products')
 @Controller('/api/products')
@@ -43,12 +45,23 @@ export class ProductsController {
     return this.productsService.createProduct(product, user.userId)
   }
 
+  /**
+   * Uploads a product image.
+   *
+   * The image must be a JPEG under 500KB in size.
+   * The image is saved to the `public/products` directory, with the filename
+   * being the product ID with the correct extension.
+   *
+   * @param file The image to upload.
+   * @param productId The ID of the product to associate the image with.
+   * @returns The ID of the product.
+   */
   @Post(':productId/image')
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
-        destination: 'public/products',
+        destination: PRODUCT_IMAGES,
         filename: (req, file, callback) => {
           callback(null, `${req.params.productId}${extname(file.originalname)}`)
         },
@@ -67,7 +80,7 @@ export class ProductsController {
     file: Express.Multer.File,
     @Param('productId') productId: string,
   ) {
-     return this.productsService.uploadProductImage(productId, file.buffer)
+    return this.productsService.uploadProductImage(productId, file.buffer)
   }
 
   @Get()
@@ -76,5 +89,13 @@ export class ProductsController {
   @UseGuards(JwtAuthGuard)
   async getProducts() {
     return this.productsService.getProducts()
+  }
+
+  @Get(':productId')
+  @UseGuards(JwtAuthGuard)
+  @ApiOkResponse({ type: ProductDto })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  async getProduct(@Param('productId') productId: string) {
+    return this.productsService.getProduct(productId)
   }
 }
