@@ -1,4 +1,4 @@
-import { IsBoolean, IsNumber, IsString } from 'class-validator'
+import { IsBoolean, IsNumber, IsDate, IsString } from 'class-validator'
 
 export class ProductDto {
   @IsString()
@@ -15,6 +15,9 @@ export class ProductDto {
 
   @IsString()
   userId: string
+
+  @IsDate()
+  createdAt: Date
 
   @IsBoolean()
   imageExists: boolean
