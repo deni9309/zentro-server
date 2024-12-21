@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt'
 import { UsersService } from '../users/users.service'
 import { TokenPayload } from './token-payload.interface'
 import { LoginUserDto } from '../users/dto/login-user.dto'
+import { JWT_ACCESS_TOKEN_EXPIRATION } from './constants'
 
 @Injectable()
 export class AuthService {
@@ -30,7 +31,7 @@ export class AuthService {
       const expires = new Date()
       expires.setMilliseconds(
         expires.getMilliseconds() +
-          ms(this.configService.getOrThrow<string>('JWT_EXPIRATION')),
+          ms(this.configService.getOrThrow<string>(JWT_ACCESS_TOKEN_EXPIRATION)),
       )
 
       const tokenPayload: TokenPayload = {

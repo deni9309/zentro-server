@@ -5,6 +5,7 @@ import { Request } from 'express'
 import { ExtractJwt, Strategy } from 'passport-jwt'
 
 import { TokenPayload } from '../token-payload.interface'
+import { JWT_ACCESS_TOKEN_SECRET } from '../constants'
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -13,7 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => request.cookies.Authentication,
       ]),
-      secretOrKey: configService.getOrThrow('JWT_SECRET'),
+      secretOrKey: configService.getOrThrow(JWT_ACCESS_TOKEN_SECRET),
     })
   }
 

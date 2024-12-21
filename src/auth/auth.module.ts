@@ -7,15 +7,19 @@ import { AuthService } from './auth.service'
 import { UsersModule } from '../users/users.module'
 import { LocalStrategy } from './strategies/local-strategy'
 import { JwtStrategy } from './strategies/jwt.strategy'
+import {
+  JWT_ACCESS_TOKEN_EXPIRATION,
+  JWT_ACCESS_TOKEN_SECRET,
+} from './constants'
 
 @Module({
   imports: [
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (cnf: ConfigService) => ({
-        secret: cnf.getOrThrow('JWT_SECRET'),
+        secret: cnf.getOrThrow(JWT_ACCESS_TOKEN_SECRET),
         signOptions: {
-          expiresIn: cnf.getOrThrow('JWT_EXPIRATION'),
+          expiresIn: cnf.getOrThrow(JWT_ACCESS_TOKEN_EXPIRATION),
         },
       }),
       inject: [ConfigService],
