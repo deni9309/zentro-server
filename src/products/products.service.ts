@@ -5,26 +5,35 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common'
 import { promises as fs } from 'fs'
+import { Prisma } from '@prisma/client'
+import { join } from 'path'
 
 import { PrismaService } from '../prisma/prisma.service'
 import { CreateProductDto } from './dto/create-product.dto'
-import { join } from 'path'
 import { PRODUCT_IMAGES } from './product-images'
-import { Prisma } from '@prisma/client'
+import { ProductsGateway } from './gateway/products.gateway'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly productsGateway: ProductsGateway,
+  ) {}
 
   async createProduct(productData: CreateProductDto, userId: string) {
     try {
-      return this.prismaService.product.create({
+      const product = await this.prismaService.product.create({
         data: {
           ...productData,
           price: Number(productData.price),
           userId,
         },
       })
+
+      this.productsGateway.handleProductUpdated()
+
+      return product
     } catch (err) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         throw new UnprocessableEntityException('Invalid data provided.')
@@ -85,8 +94,18 @@ export class ProductsService {
         where: { id: productId },
         data: product,
       })
+
+      this.productsGateway.handleProductUpdated()
     } catch (error) {
-      throw error
+      console.error('Error updating product', error)
+
+      if (error instanceof PrismaClientKnownRequestError) {
+        throw new UnprocessableEntityException('Invalid data provided.')
+      } else {
+        throw new InternalServerErrorException(
+          'Internal server error while updating product',
+        )
+      }
     }
   }
 
