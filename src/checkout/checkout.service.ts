@@ -1,12 +1,13 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import Stripe from 'stripe'
 
 import { ProductsService } from '../products/products.service'
+import Stripe from 'stripe'
 
 @Injectable()
 export class CheckoutService {
@@ -21,6 +22,7 @@ export class CheckoutService {
       const product = await this.productService.getProduct(productId)
 
       const session = await this.stripe.checkout.sessions.create({
+        metadata: { productId },
         line_items: [
           {
             price_data: {
@@ -45,6 +47,28 @@ export class CheckoutService {
         throw err
       } else {
         throw new BadRequestException('Error creating Stripe checkout session')
+      }
+    }
+  }
+
+  async handleCheckoutWebhook(event: any) {
+    if (event.type !== 'checkout.session.completed') return
+
+    try {
+      const session = await this.stripe.checkout.sessions.retrieve(
+        event.data.object.id,
+      )
+
+      await this.productService.updateProduct(session.metadata.productId, {
+        sold: true,
+      })
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException('Product not found')
+      } else {
+        throw new InternalServerErrorException(
+          "Error updating product's sold status",
+        )
       }
     }
   }

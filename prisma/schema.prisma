@@ -27,5 +27,6 @@ model Product {
   price       Float
   user        User     @relation(fields: [userId], references: [id])
   userId      String
+  sold        Boolean  @default(false)
   createdAt   DateTime @default(dbgenerated("NOW()")) @db.Timestamptz(3)
 }

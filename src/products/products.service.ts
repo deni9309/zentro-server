@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service'
 import { CreateProductDto } from './dto/create-product.dto'
 import { join } from 'path'
 import { PRODUCT_IMAGES } from './product-images'
+import { Prisma } from '@prisma/client'
 
 @Injectable()
 export class ProductsService {
@@ -26,7 +27,7 @@ export class ProductsService {
   }
 
   async getProducts() {
-    const products = (await this.prismaService.product.findMany())
+    const products = await this.prismaService.product.findMany()
 
     return Promise.all(
       products.map(async (product) => ({
@@ -46,6 +47,17 @@ export class ProductsService {
       }
     } catch (_) {
       throw new NotFoundException(`Product with ID ${productId} not found.`)
+    }
+  }
+
+  async updateProduct(productId: string, product: Prisma.ProductUpdateInput) {
+    try {
+      await this.prismaService.product.update({
+        where: { id: productId },
+        data: product,
+      })
+    } catch (error) {
+      throw error
     }
   }
 
