@@ -26,7 +26,7 @@ export class AuthController {
 
   @ApiOperation({
     summary:
-      'Logs the user in, attaches an "Authentication" cookie to the response',
+      'Logs the user in - attaches an "Authentication" cookie to the response headers.',
   })
   @ApiUnauthorizedResponse({ description: 'Credentials are not valid.' })
   @HttpCode(200)

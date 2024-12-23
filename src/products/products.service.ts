@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common'
 import { promises as fs } from 'fs'
 
 import { PrismaService } from '../prisma/prisma.service'
@@ -12,13 +17,22 @@ export class ProductsService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createProduct(productData: CreateProductDto, userId: string) {
-    return this.prismaService.product.create({
-      data: {
-        ...productData,
-        price: Number(productData.price),
-        userId,
-      },
-    })
+    try {
+      return this.prismaService.product.create({
+        data: {
+          ...productData,
+          price: Number(productData.price),
+          userId,
+        },
+      })
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        throw new UnprocessableEntityException('Invalid data provided.')
+      }
+
+      console.error('Error creating product', err)
+      throw new InternalServerErrorException('Error creating product')
+    }
   }
 
   uploadProductImage(productId: string, file: Buffer) {
@@ -26,15 +40,25 @@ export class ProductsService {
     console.log('file', file)
   }
 
-  async getProducts() {
-    const products = await this.prismaService.product.findMany()
+  async getProducts(status?: string) {
+    try {
+      const args: Prisma.ProductFindManyArgs = {}
+      if (status && status === 'available') {
+        args.where = { sold: false }
+      }
 
-    return Promise.all(
-      products.map(async (product) => ({
-        ...product,
-        imageExists: await this.imageExists(product.id),
-      })),
-    )
+      const products = await this.prismaService.product.findMany(args)
+
+      return Promise.all(
+        products.map(async (product) => ({
+          ...product,
+          imageExists: await this.imageExists(product.id),
+        })),
+      )
+    } catch (error) {
+      console.error('Error getting products', error)
+      throw new InternalServerErrorException('Error getting products')
+    }
   }
 
   async getProduct(productId: string) {
@@ -45,8 +69,13 @@ export class ProductsService {
         })),
         imageExists: await this.imageExists(productId),
       }
-    } catch (_) {
-      throw new NotFoundException(`Product with ID ${productId} not found.`)
+    } catch (err) {
+      console.error('Error getting product', err)
+      if (err instanceof NotFoundException) {
+        throw new NotFoundException(`Product with ID ${productId} not found.`)
+      } else {
+        throw new InternalServerErrorException('Error getting product')
+      }
     }
   }
 

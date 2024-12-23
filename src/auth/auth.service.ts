@@ -30,8 +30,11 @@ export class AuthService {
 
       const expires = new Date()
       expires.setMilliseconds(
-        expires.getMilliseconds() +
-          ms(this.configService.getOrThrow<string>(JWT_ACCESS_TOKEN_EXPIRATION)),
+        expires.getMilliseconds() -
+          expires.getTimezoneOffset() * 60 * 1000 +
+          ms(
+            this.configService.getOrThrow<string>(JWT_ACCESS_TOKEN_EXPIRATION),
+          ),
       )
 
       const tokenPayload: TokenPayload = {
@@ -48,7 +51,8 @@ export class AuthService {
       })
 
       return { tokenPayload }
-    } catch (_err) {
+    } catch (err) {
+      console.error('Error logging in',err)
       throw new UnauthorizedException('Credentials are not valid.')
     }
   }
@@ -63,7 +67,8 @@ export class AuthService {
       }
 
       return user
-    } catch (_err) {
+    } catch (err) {
+      console.error('Error verifying user', err)
       throw new UnauthorizedException('Credentials are not valid.')
     }
   }

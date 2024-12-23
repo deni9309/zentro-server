@@ -7,16 +7,19 @@ import {
   Param,
   ParseFilePipe,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common'
 import {
   ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
@@ -36,6 +39,7 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @ApiCreatedResponse({ description: 'Product created.' })
+  @ApiUnprocessableEntityResponse({ description: 'Invalid data provided.' })
   @Post()
   @UseGuards(JwtAuthGuard)
   async createProduct(
@@ -85,10 +89,13 @@ export class ProductsController {
 
   @Get()
   @ApiOkResponse({ type: ProductDto, isArray: true })
+  @ApiInternalServerErrorResponse({
+    description: 'Internal server error occurred while getting products',
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   @UseGuards(JwtAuthGuard)
-  async getProducts() {
-    return this.productsService.getProducts()
+  async getProducts(@Query('status') status?: string) {
+    return this.productsService.getProducts(status)
   }
 
   @Get(':productId')
