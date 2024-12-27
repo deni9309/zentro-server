@@ -52,9 +52,10 @@ export class CheckoutService {
   }
 
   async handleCheckoutWebhook(event: any) {
-    if (event.type !== 'checkout.session.completed') return
-
+    console.log('event.data.object.id', event.data.object.id)
     try {
+      if (event.type !== 'checkout.session.completed') return
+      
       const session = await this.stripe.checkout.sessions.retrieve(
         event.data.object.id,
       )
@@ -65,11 +66,16 @@ export class CheckoutService {
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new NotFoundException('Product not found')
-      } else {
-        throw new InternalServerErrorException(
-          "Error updating product's sold status",
-        )
       }
+
+      console.error(
+        "Error updating product's sold status",
+        error.message,
+        error.stack,
+      )
+      throw new InternalServerErrorException(
+        "Error updating product's sold status",
+      )
     }
   }
 }

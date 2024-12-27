@@ -27,13 +27,14 @@ export class CheckoutController {
   }
 
   @Post('webhook')
-  @ApiOkResponse({ description: 'Product checkout event processed successfully' })
+  @ApiOkResponse({
+    description: 'Product checkout event processed successfully',
+  })
   @ApiNotFoundResponse({ description: 'Product not found' })
   @ApiInternalServerErrorResponse({
     description: "Error updating product's sold status",
   })
   @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
   async handleCheckoutWebhook(@Body() event: any) {
     return this.checkoutService.handleCheckoutWebhook(event)
   }
