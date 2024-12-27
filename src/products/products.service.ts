@@ -6,13 +6,13 @@ import {
 } from '@nestjs/common'
 import { promises as fs } from 'fs'
 import { Prisma } from '@prisma/client'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { join } from 'path'
 
 import { PrismaService } from '../prisma/prisma.service'
 import { CreateProductDto } from './dto/create-product.dto'
 import { PRODUCT_IMAGES } from './product-images'
 import { ProductsGateway } from './gateway/products.gateway'
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 
 @Injectable()
 export class ProductsService {
@@ -52,9 +52,9 @@ export class ProductsService {
   async getProducts(status?: string) {
     try {
       const args: Prisma.ProductFindManyArgs = {}
-      if (status && status === 'available') {
-        args.where = { sold: false }
-      }
+
+      if (status && status === 'available') args.where = { sold: false }
+      if (status && status === 'sold') args.where = { sold: true }
 
       const products = await this.prismaService.product.findMany(args)
 
@@ -97,11 +97,10 @@ export class ProductsService {
 
       this.productsGateway.handleProductUpdated()
     } catch (error) {
-      console.error('Error updating product', error)
-
       if (error instanceof PrismaClientKnownRequestError) {
         throw new UnprocessableEntityException('Invalid data provided.')
       } else {
+        console.error('Error updating product', error)
         throw new InternalServerErrorException(
           'Internal server error while updating product',
         )

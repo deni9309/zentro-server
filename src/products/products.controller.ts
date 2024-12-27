@@ -17,6 +17,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiQuery,
   ApiTags,
   ApiUnauthorizedResponse,
   ApiUnprocessableEntityResponse,
@@ -93,6 +94,7 @@ export class ProductsController {
     description: 'Internal server error occurred while getting products',
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized' })
+  @ApiQuery({ name: 'status', enum: ['available', 'sold'], required: false })
   @UseGuards(JwtAuthGuard)
   async getProducts(@Query('status') status?: string) {
     return this.productsService.getProducts(status)
