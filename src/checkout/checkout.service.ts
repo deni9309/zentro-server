@@ -52,7 +52,6 @@ export class CheckoutService {
   }
 
   async handleCheckoutWebhook(event: any) {
-    console.log('event.data.object.id', event.data.object.id)
     try {
       if (event.type !== 'checkout.session.completed') return
       

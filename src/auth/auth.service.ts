@@ -52,7 +52,7 @@ export class AuthService {
 
       return { tokenPayload }
     } catch (err) {
-      console.error('Error logging in',err)
+      console.error('Error logging in', err)
       throw new UnauthorizedException('Credentials are not valid.')
     }
   }
@@ -70,6 +70,14 @@ export class AuthService {
     } catch (err) {
       console.error('Error verifying user', err)
       throw new UnauthorizedException('Credentials are not valid.')
+    }
+  }
+
+  async verifyToken(token: string) {
+    try {
+      return this.jwtService.verifyAsync(token)
+    } catch (error) {
+      throw error
     }
   }
 }

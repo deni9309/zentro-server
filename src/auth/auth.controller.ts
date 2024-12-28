@@ -11,11 +11,9 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger'
-// import { User } from '@prisma/client'
 import { Response } from 'express'
 
 import { LocalAuthGuard } from './guards/local-auth.guard'
-// import { CurrentUser } from './current-user.decorator'
 import { AuthService } from './auth.service'
 import { LoginUserDto } from '../users/dto/login-user.dto'
 
