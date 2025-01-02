@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { LoggerModule } from 'nestjs-pino'
-import { join } from 'path';
-import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path'
+import { ServeStaticModule } from '@nestjs/serve-static'
 
 import { UsersModule } from './users/users.module'
-import { AuthModule } from './auth/auth.module';
-import { ProductsModule } from './products/products.module';
-import { CheckoutModule } from './checkout/checkout.module';
+import { AuthModule } from './auth/auth.module'
+import { ProductsModule } from './products/products.module'
+import { CheckoutModule } from './checkout/checkout.module'
+import { HealthController } from './health.controller'
 
 @Module({
   imports: [
@@ -38,7 +39,7 @@ import { CheckoutModule } from './checkout/checkout.module';
     ProductsModule,
     CheckoutModule,
   ],
-  controllers: [],
+  controllers: [HealthController],
   providers: [],
 })
 export class AppModule {}
